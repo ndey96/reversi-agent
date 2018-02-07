@@ -1,4 +1,4 @@
-# reversi-agent
+# reversi-ai
 
 - write/obtain implementation of reversi
     - input: moves using the standard notation XY -> [a-h][1-8]
