@@ -137,10 +137,10 @@ def build_tree(node, board, player, depth_limit=None, curr_player=None):
 def get_path_from_parent(node):
     path_to_parent = []
     curr = node
-    while curr.parent != None:
+    while curr != None:
         path_to_parent.append(curr.move)
         curr = curr.parent
-    return list(reversed(path_to_parent))
+    return list(reversed(path_to_parent))[1:]
 
 
 class AI:
@@ -158,6 +158,7 @@ class AI:
             min_node = None
             for child in node.children:
                 if child.eval_val < self.best_score: # alpha-beta pruning
+                    local_min = float("-inf")
                     break
                 if child.eval_val < local_min:
                     local_min = child.eval_val
@@ -165,87 +166,10 @@ class AI:
             if local_min > self.best_score:
                 self.best_score = local_min
                 self.best_path = get_path_from_parent(min_node)
+                print('plz',self.best_score,self.best_path)
         else:
             for child in node.children:
                 self._minimax(child)
-
-# def draw_board(board, player):
-#     #while True:
-#
-#     moves = get_valid_moves(board,player)
-#     #print(moves)
-#     os.system('clear')
-#     print('a b c d e f g h \n')
-#     row = ''
-#     for i in range(len(board)):
-#         for j in range(len(board)):
-#             row += str(board[i][j])
-#             row += ' '
-#
-#         row += ' '
-#         row += str(i+1)
-#         print(row)
-#         row = ''
-#
-#     moves = get_valid_moves(board,player)
-#     #print('\nPlayer ' + str(player) + "'s turn!")
-#     if len(moves) == 0:
-#         #print('No moves available!')
-#         player = get_other_player(player)
-#         #print('\nPlayer ' + str(player) + "'s turn!")
-#         moves = get_valid_moves(board,player)
-#
-#         if len(moves) == 0:
-#             print('No moves available for both players')
-#             print('Game over!')
-#             end_game(board)
-#
-#         else:
-#             print('Player ' + str(get_other_player(player)) + ' has no valid moves')
-#
-#     print('\nPlayer ' + str(player) + "'s turn!")
-#     make_move(board, moves, player)
-
-# def make_move(board, moves, player):
-#     print('Possible moves: ')
-#     move_str = ''
-#     for move in moves:
-#         x = move[0]
-#         y = move[1]
-#
-#         move_str += chr(x+97)
-#         move_str += str(y+1) + ' '
-#
-#     print(move_str)
-#
-#     next_move = ''
-#     while True:
-#         next_move = input('Please make move: ')
-#         if len(next_move) == 2:
-#             break
-#         else:
-#             print('Move not valid!')
-#             print('Possible moves: ')
-#             print(move_str)
-#
-#     while True:
-#         x = ord(next_move[0])-97
-#         y = int(next_move[1])-1
-#
-#         if (x,y) in moves:
-#             break
-#
-#         else:
-#             print('Move not valid!')
-#             print('Possible moves: ')
-#             print(move_str)
-#
-#         next_move = input('Please make move: ')
-#
-#     board[y][x] = player
-#     flip_tiles_on_board(board, player, moves[(x,y)])
-#     player = get_other_player(player)
-#     draw_board(board,player)
 
 def board_full(board):
     cols, rows = get_board_dims(board)
@@ -331,7 +255,10 @@ class Game:
         ai = AI()
         build_tree(ai.parent_node, self.board, self.ai, depth_limit=2, curr_player=self.curr_player)
         ai.minimax()
-        best_move = (ai.best_path[0][0], ai.best_path[0][1])
+        print('lol',ai.best_path)
+        print('tree',ai.parent_node.children)
+        x,y,_ = ai.best_path[0]
+        best_move = (x,y)
         self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
