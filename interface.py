@@ -147,9 +147,12 @@ class AI:
     def __init__(self):
         self.best_score = float("-inf")
         self.best_path = []
-        self.parent_node
+        self.parent_node = Node()
 
-    def minimax(self, node):
+    def minimax(self):
+        self._minimax(self.parent_node)
+
+    def _minimax(self, node):
         if len(node.children) and node.children[0].children == []:
             local_min = float("inf")
             min_node = None
@@ -164,7 +167,7 @@ class AI:
                 self.best_path = get_path_from_parent(min_node)
         else:
             for child in node.children:
-                self.minimax(child)
+                self._minimax(child)
 
 # def draw_board(board, player):
 #     #while True:
@@ -323,15 +326,19 @@ class Game:
             print(line)
 
     def ai_turn(self):
-        moves_dict = self.get_valid_moves()
         self.print_board()
+        moves_dict = self.get_valid_moves()
+        ai = AI()
+        build_tree(ai.parent_node, self.board, self.ai, depth_limit=2, curr_player=self.curr_player)
+        ai.minimax()
+        best_move = (ai.best_path[0][0], ai.best_path[0][1])
+        self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
         self.print_board()
         moves_dict = self.get_valid_moves()
         possible_moves_str = 'Possible moves: '
         for cart in moves_dict.keys():
-            print(cart)
             possible_moves_str += get_standard_from_cartesian(cart) + ' '
         print(possible_moves_str)
 
@@ -350,7 +357,6 @@ class Game:
 def main():
     try:
         game = Game()
-
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
@@ -359,8 +365,8 @@ def main():
             print('Player ' + str(game.curr_player) + "'s turn!")
             if game.curr_player == game.human:
                 game.human_turn()
-            else:
-                game.human_turn()
+            if game.curr_player == game.ai:
+                game.ai_turn()
             game.curr_player = get_other_player(game.curr_player)
 
     except KeyboardInterrupt:
