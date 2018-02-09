@@ -296,7 +296,7 @@ def main():
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
-        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 4 recommended): '))
+        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 3 recommended): '))
         while game.game_is_not_over():
             os.system('clear')
             print('Player ' + str(game.curr_player) + "'s turn!")
