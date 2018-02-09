@@ -1,4 +1,5 @@
 from copy import deepcopy
+import sys, traceback, os
 
 BOARD_DIRECTIONS = (
     (1,0),
@@ -58,7 +59,6 @@ def get_valid_moves(board, player):
     return moves_dict
 
 def flip_tiles_on_board(board, player, tiles_to_flip):
-    print(tiles_to_flip)
     for x,y in tiles_to_flip:
         board[y][x] = player
 
@@ -147,33 +147,34 @@ def get_path_from_parent(node):
         curr = curr.parent
     return list(reversed(path_to_parent))
 
-def minimax(node):
-    best_score = -999999
-    best_path = []
-    _minimax(node, best_score, best_path)
-    return best_score, best_path
 
-def _minimax(node, best_score, best_path):
-    if len(node.children) and node.children[0].children == []:
-        local_min = float("inf")
-        min_node = None
-        for child in node.children:
-            if child.eval_val < best_score: # alpha-beta pruning
-                break
-            if child.eval_val < local_min:
-                local_min = child.eval_val
-                min_node = child
-        if local_min > best_score:
-            best_score = local_min
-            best_path = get_path_from_parent(min_node)
-    else:
-        for child in node.children:
-            score, path = _minimax(child, best_score, best_path)
-            if score > best_score:
-                best_score = score
-                best_path = path
-    return best_score, best_path
+class Lol:
+    def __init__(self):
+        self.best_score = float("-inf")
+        self.best_path = []
 
+#     def minimax(node):
+#         best_score = float("-inf")
+#         best_path = []
+#         _minimax(node, best_score, best_path)
+#         return best_score, best_path
+
+    def minimax(self, node):
+        if len(node.children) and node.children[0].children == []:
+            local_min = float("inf")
+            min_node = None
+            for child in node.children:
+                if child.eval_val < self.best_score: # alpha-beta pruning
+                    break
+                if child.eval_val < local_min:
+                    local_min = child.eval_val
+                    min_node = child
+            if local_min > self.best_score:
+                self.best_score = local_min
+                self.best_path = get_path_from_parent(min_node)
+        else:
+            for child in node.children:
+                self.minimax(child)
 test_board = [
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
@@ -185,6 +186,13 @@ test_board = [
     [0,0,0,0,0,0,0,0]
 ]
 
+test_board2 = [
+    [0,0,0,0],
+    [0,1,2,0],
+    [0,2,1,0],
+    [0,0,0,0]
+]
+
 def gameHeader():
     print('Welcome to Reversi!')
     player = int(input('Please select player (1/2): '))
@@ -193,7 +201,7 @@ def gameHeader():
     return player
 
 def draw_board(board, player):
-    #while True:
+    os.system('clear')
     print('a b c d e f g h \n')
     row = ''
     for i in range(len(board)):
@@ -207,7 +215,21 @@ def draw_board(board, player):
         row = ''
 
     moves = get_valid_moves(board,player)
-    #print(moves)
+    #print('\nPlayer ' + str(player) + "'s turn!")
+    if len(moves) == 0:
+        #print('No moves available!')
+        player = get_other_player(player)
+        #print('\nPlayer ' + str(player) + "'s turn!")
+        moves = get_valid_moves(board,player)
+
+        if len(moves) == 0:
+            print('No moves available for both players')
+            print('Game over!')
+            end_game(board)
+
+        else:
+            print('Player ' + str(get_other_player(player)) + ' has no valid moves')
+
     print('\nPlayer ' + str(player) + "'s turn!")
     make_move(board, moves, player)
 
@@ -218,8 +240,8 @@ def make_move(board, moves, player):
         x = move[0]
         y = move[1]
 
-        move_str += chr(y+97)
-        move_str += str(x+1) + ' '
+        move_str += chr(x+97)
+        move_str += str(y+1) + ' '
 
     print(move_str)
 
@@ -247,19 +269,38 @@ def make_move(board, moves, player):
 
         next_move = input('Please make move: ')
 
-    #print((x,y))
     board[y][x] = player
     flip_tiles_on_board(board, player, moves[(x,y)])
     player = get_other_player(player)
     draw_board(board,player)
 
+def end_game(board):
+    c1 = 0
+    c2 = 0
+    for x in range(len(board)):
+        for y in range(len(board)):
+            if board[x][y] == 1: c1 += 1
+            elif board[x][y] == 2: c2 += 2
 
+    if c1 > c2:
+        print('Player 1 wins with ' + str(c1) + ' pieces!')
+    elif c2 > c1:
+        print('Player 2 wins with ' + str(c2) + ' pieces!')
+    else:
+        print('Game tied!')
 
-def run():
-    player = gameHeader()
-    ai = get_other_player(player)
+    sys.exit(0)
 
-    moves = draw_board(test_board, player)
+def main():
+    try:
+        player = gameHeader()
+        ai = get_other_player(player)
+        moves = draw_board(test_board, player)
 
+    except KeyboardInterrupt:
+        print('\nExiting game...')
 
-run()
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
