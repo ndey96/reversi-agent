@@ -1,5 +1,5 @@
 from copy import deepcopy
-import sys, traceback, os
+import sys, traceback, os, datetime
 
 BOARD_DIRECTIONS = (
     (1,0),
@@ -11,6 +11,8 @@ BOARD_DIRECTIONS = (
     (0,1),
     (1,1),
 )
+
+AVG_TIMES = [2, 8, 250, 3700, 15000, 75000]
 
 def is_in_board(board, x, y):
     board_width, board_height = get_board_dims(board)
@@ -166,7 +168,7 @@ class AI:
             if local_min > self.best_score:
                 self.best_score = local_min
                 self.best_path = get_path_from_parent(min_node)
-                print('plz',self.best_score,self.best_path)
+                #print('plz',self.best_score,self.best_path)
         else:
             for child in node.children:
                 self._minimax(child)
@@ -177,6 +179,20 @@ def get_cartesian_from_standard(standard):
 def get_standard_from_cartesian(cartesian):
     x,y = cartesian
     return str(unichr(x + 97)) + str(y + 1)
+
+def get_depth_from_time(secs):
+    time_limit = secs * 1000
+    depth_limit = 6
+    for i in range(len(AVG_TIMES)-1):
+        if time_limit > AVG_TIMES[i]:
+            continue
+
+        depth_limit = i+1
+
+        break
+    print depth_limit
+    return depth_limit
+
 
 class Game:
     def __init__(self):
@@ -246,15 +262,19 @@ class Game:
         self.print_board()
         moves_dict = get_valid_moves(self.board, self.ai)
         ai = AI()
+        #time1 = datetime.datetime.now()
         build_tree(node=ai.parent_node, board=self.board, player=self.ai, depth_limit=self.depth_limit, curr_player=self.curr_player)
         ai.minimax()
-        print('lol',ai.best_path)
-        print('tree',ai.parent_node.children)
+        #time2 = datetime.datetime.now()
+        #delta = time2-time1
+        #print int(delta.total_seconds() * 1000)
+        #print('lol',ai.best_path)
+        #print('tree',ai.parent_node.children)
         for a in ai.parent_node.children:
             print(a.move)
         x,y,_ = ai.best_path[0]
         best_move = (x,y)
-        print('nolan', moves_dict)
+        #print('nolan', moves_dict)
         self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
@@ -296,7 +316,8 @@ def main():
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
-        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 3 recommended): '))
+        time_limit = int(raw_input('Please specify time limit (in seconds): '))
+        game.depth_limit = get_depth_from_time(time_limit)
         while game.game_is_not_over():
             os.system('clear')
             print('Player ' + str(game.curr_player) + "'s turn!")
