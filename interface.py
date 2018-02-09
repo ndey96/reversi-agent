@@ -58,6 +58,7 @@ def get_valid_moves(board, player):
     return moves_dict
 
 def flip_tiles_on_board(board, player, tiles_to_flip):
+    print(tiles_to_flip)
     for x,y in tiles_to_flip:
         board[y][x] = player
 
@@ -222,19 +223,37 @@ def make_move(board, moves, player):
 
     print(move_str)
 
-    next_move = input('Please make move: ')
-    while len(next_move) > 2:
-        print('Move not valid!')
+    next_move = ''
+    while True:
+        next_move = input('Please make move: ')
+        if len(next_move) == 2:
+            break
+        else:
+            print('Move not valid!')
+            print('Possible moves: ')
+            print(move_str)
+
+    while True:
+        x = ord(next_move[0])-97
+        y = int(next_move[1])-1
+
+        if (x,y) in moves:
+            break
+
+        else:
+            print('Move not valid!')
+            print('Possible moves: ')
+            print(move_str)
+
         next_move = input('Please make move: ')
 
-    y = ord(next_move[0])-97
-    x = int(next_move[1])-1
-    print((x,y))
-    print(moves)
-    if (x,y) in moves:
-        print('enter if')
-        flip_tiles_on_board(board, player, moves[(x,y)])
-        draw_board(board,player)
+    #print((x,y))
+    board[y][x] = player
+    flip_tiles_on_board(board, player, moves[(x,y)])
+    player = get_other_player(player)
+    draw_board(board,player)
+
+
 
 def run():
     player = gameHeader()
