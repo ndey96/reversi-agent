@@ -198,7 +198,6 @@ class Game:
     def game_over(self):
         c1, c2 = 0, 0
         cols, rows = get_board_dims(self.board)
-        print c1
         for x in range(cols):
             for y in range(rows):
                 if self.board[y][x] == 1:
@@ -297,7 +296,7 @@ def main():
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
-        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 3 recommended): '))
+        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 4 recommended): '))
         while game.game_is_not_over():
             os.system('clear')
             print('Player ' + str(game.curr_player) + "'s turn!")
