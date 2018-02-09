@@ -166,7 +166,6 @@ class AI:
             if local_min > self.best_score:
                 self.best_score = local_min
                 self.best_path = get_path_from_parent(min_node)
-                print('plz',self.best_score,self.best_path)
         else:
             for child in node.children:
                 self._minimax(child)
@@ -201,8 +200,8 @@ class Game:
             for y in range(rows):
                 if self.board[y][x] == 1:
                     c1 += 1
-                if self.board[y][x] == 2:
-                    c2 += 2
+                elif self.board[y][x] == 2:
+                    c2 += 1
         if c1 > c2:
             print('Player 1 wins with ' + str(c1) + ' pieces!')
         elif c2 > c1:
@@ -220,17 +219,6 @@ class Game:
         self.board[y][x] = self.curr_player # Place player's tile at x,y
         self.flip_tiles(tiles_to_flip)
 
-    # def get_valid_moves(self, player):
-    #     cols, rows = get_board_dims(self.board)
-    #     moves_dict = {}
-    #     for x in range(cols):
-    #         for y in range(rows):
-    #             if self.board[y][x] == 0:
-    #                 tiles_to_flip = is_valid_move(self.board, player, x, y)
-    #                 if tiles_to_flip != None:
-    #                     moves_dict[(x,y)] = tiles_to_flip
-    #     return moves_dict
-
     def print_board(self):
         cols, rows = get_board_dims(self.board)
         print(' a b c d e f g h')
@@ -241,19 +229,16 @@ class Game:
             line += ' ' + str(y+1)
             print(line)
 
-    def ai_turn(self):
+    def ai_turn(self, player=None):
+        if player == None:
+            player = self.ai
         self.print_board()
-        moves_dict = get_valid_moves(self.board, self.ai)
+        moves_dict = get_valid_moves(self.board, player)
         ai = AI()
-        build_tree(node=ai.parent_node, board=self.board, player=self.ai, depth_limit=2, curr_player=self.curr_player)
+        build_tree(node=ai.parent_node, board=self.board, player=player, depth_limit=2, curr_player=self.curr_player)
         ai.minimax()
-        print('lol',ai.best_path)
-        print('tree',ai.parent_node.children)
-        for a in ai.parent_node.children:
-            print(a.move)
         x,y,_ = ai.best_path[0]
         best_move = (x,y)
-        print('nolan', moves_dict)
         self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
@@ -300,13 +285,14 @@ def main():
             print('Player ' + str(game.curr_player) + "'s turn!")
             if game.curr_player == game.human:
                 game.human_turn()
+                # game.ai_turn(game.human) # Uncomment to make ai play against itself
             if game.curr_player == game.ai:
                 game.ai_turn()
             game.curr_player = get_other_player(game.curr_player)
         game.game_over()
 
     except KeyboardInterrupt:
-        print('\nExiting game...')
+        print('Exiting game...')
         sys.exit(0)
 
 if __name__ == "__main__":
