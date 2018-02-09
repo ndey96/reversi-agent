@@ -179,7 +179,7 @@ test_board = [
     [0,0,0,0,0,0,0,0],
     [0,0,0,1,2,0,0,0],
     [0,0,0,2,1,0,0,0],
-    [0,0,0,0,2,1,0,0],
+    [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0]
 ]
@@ -206,10 +206,11 @@ def draw_board(board, player):
         row = ''
 
     moves = get_valid_moves(board,player)
+    #print(moves)
     print('\nPlayer ' + str(player) + "'s turn!")
-    make_move(moves)
+    make_move(board, moves, player)
 
-def make_move(moves):
+def make_move(board, moves, player):
     print('Possible moves: ')
     move_str = ''
     for move in moves:
@@ -220,8 +221,26 @@ def make_move(moves):
         move_str += str(x+1) + ' '
 
     print(move_str)
-    next_move = input('Please make move: ')
 
-player = gameHeader()
-#print player
-draw_board(test_board, player)
+    next_move = input('Please make move: ')
+    while len(next_move) > 2:
+        print('Move not valid!')
+        next_move = input('Please make move: ')
+
+    y = ord(next_move[0])-97
+    x = int(next_move[1])-1
+    print((x,y))
+    print(moves)
+    if (x,y) in moves:
+        print('enter if')
+        flip_tiles_on_board(board, player, moves[(x,y)])
+        draw_board(board,player)
+
+def run():
+    player = gameHeader()
+    ai = get_other_player(player)
+
+    moves = draw_board(test_board, player)
+
+
+run()
