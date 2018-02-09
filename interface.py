@@ -193,10 +193,12 @@ class Game:
         self.curr_player = 1
         self.human = None
         self.ai = None
+        self.depth_limit = None
 
     def game_over(self):
         c1, c2 = 0, 0
         cols, rows = get_board_dims(self.board)
+        print c1
         for x in range(cols):
             for y in range(rows):
                 if self.board[y][x] == 1:
@@ -245,7 +247,7 @@ class Game:
         self.print_board()
         moves_dict = get_valid_moves(self.board, self.ai)
         ai = AI()
-        build_tree(node=ai.parent_node, board=self.board, player=self.ai, depth_limit=2, curr_player=self.curr_player)
+        build_tree(node=ai.parent_node, board=self.board, player=self.ai, depth_limit=self.depth_limit, curr_player=self.curr_player)
         ai.minimax()
         print('lol',ai.best_path)
         print('tree',ai.parent_node.children)
@@ -295,6 +297,7 @@ def main():
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
+        game.depth_limit = int(raw_input('Please specify depth limit (1-10, 3 recommended): '))
         while game.game_is_not_over():
             os.system('clear')
             print('Player ' + str(game.curr_player) + "'s turn!")
