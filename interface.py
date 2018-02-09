@@ -171,14 +171,6 @@ class AI:
             for child in node.children:
                 self._minimax(child)
 
-def board_full(board):
-    cols, rows = get_board_dims(board)
-    for x in range(cols):
-        for y in range(rows):
-            if board[y][x] == 0:
-                return False
-    return True
-
 def get_cartesian_from_standard(standard):
     return (ord(standard[0]) - 97, int(standard[1]) - 1)
 
@@ -228,13 +220,13 @@ class Game:
         self.board[y][x] = self.curr_player # Place player's tile at x,y
         self.flip_tiles(tiles_to_flip)
 
-    def get_valid_moves(self):
+    def get_valid_moves(self, player):
         cols, rows = get_board_dims(self.board)
         moves_dict = {}
         for x in range(cols):
             for y in range(rows):
                 if self.board[y][x] == 0:
-                    tiles_to_flip = is_valid_move(self.board, self.curr_player, x, y)
+                    tiles_to_flip = is_valid_move(self.board, player, x, y)
                     if tiles_to_flip != None:
                         moves_dict[(x,y)] = tiles_to_flip
         return moves_dict
@@ -251,19 +243,20 @@ class Game:
 
     def ai_turn(self):
         self.print_board()
-        moves_dict = self.get_valid_moves()
+        moves_dict = self.get_valid_moves(self.ai)
         ai = AI()
-        build_tree(ai.parent_node, self.board, self.ai, depth_limit=2, curr_player=self.curr_player)
+        build_tree(node=ai.parent_node, board=self.board, player=self.ai, depth_limit=2, curr_player=self.curr_player)
         ai.minimax()
         print('lol',ai.best_path)
         print('tree',ai.parent_node.children)
         x,y,_ = ai.best_path[0]
         best_move = (x,y)
+        print('nolan', moves_dict.keys())
         self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
         self.print_board()
-        moves_dict = self.get_valid_moves()
+        moves_dict = self.get_valid_moves(self.human)
         possible_moves_str = 'Possible moves: '
         for cart in moves_dict.keys():
             possible_moves_str += get_standard_from_cartesian(cart) + ' '
@@ -281,17 +274,30 @@ class Game:
             print(possible_moves_str)
         self.make_move(move, moves_dict[move])
 
+    def board_full(self):
+        cols, rows = get_board_dims(self.board)
+        for x in range(cols):
+            for y in range(rows):
+                if self.board[y][x] == 0:
+                    return False
+        return True
+
+    def game_not_over(self):
+        human_moves = self.get_valid_moves(self.human)
+        ai_moves = self.get_valid_moves(self.ai)
+        return len(human_moves) or len(ai_moves)
+
 def main():
     try:
         game = Game()
         print('Welcome to Reversi!')
         game.human = int(raw_input('Please select player (1/2): '))
         game.ai = get_other_player(game.human)
-        while not board_full(game.board):
+        while game.game_not_over():
             os.system('clear')
             print('Player ' + str(game.curr_player) + "'s turn!")
             if game.curr_player == game.human:
-                game.human_turn()
+                game.ai_turn()
             if game.curr_player == game.ai:
                 game.ai_turn()
             game.curr_player = get_other_player(game.curr_player)
