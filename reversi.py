@@ -203,7 +203,7 @@ class Game:
                 if self.board[y][x] == 1:
                     c1 += 1
                 if self.board[y][x] == 2:
-                    c2 += 2
+                    c2 += 1
         if c1 > c2:
             print('Player 1 wins with ' + str(c1) + ' pieces!')
         elif c2 > c1:
