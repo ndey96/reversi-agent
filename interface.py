@@ -143,56 +143,6 @@ def get_path_from_parent(node):
     return list(reversed(path_to_parent))
 
 
-class Lol:
-    def __init__(self):
-        self.best_score = float("-inf")
-        self.best_path = []
-
-#     def minimax(node):
-#         best_score = float("-inf")
-#         best_path = []
-#         _minimax(node, best_score, best_path)
-#         return best_score, best_path
-
-    def minimax(self, node):
-        if len(node.children) and node.children[0].children == []:
-            local_min = float("inf")
-            min_node = None
-            for child in node.children:
-                if child.eval_val < self.best_score: # alpha-beta pruning
-                    break
-                if child.eval_val < local_min:
-                    local_min = child.eval_val
-                    min_node = child
-            if local_min > self.best_score:
-                self.best_score = local_min
-                self.best_path = get_path_from_parent(min_node)
-        else:
-            for child in node.children:
-                self.minimax(child)
-test_board = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,1,2,0,0,0],
-    [0,0,0,2,1,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0]
-]
-
-test_board2 = [
-    [0,0,0,0],
-    [0,1,2,0],
-    [0,2,1,0],
-    [0,0,0,0]
-]
-
-def gameHeader():
-    print('Welcome to Reversi!')
-    player = int(input('Please select player (1/2): '))
-    print("Starting game...\n")
-
 class AI:
     def __init__(self):
         self.best_score = float("-inf")
@@ -216,83 +166,83 @@ class AI:
             for child in node.children:
                 self.minimax(child)
 
-def draw_board(board, player):
-    #while True:
+# def draw_board(board, player):
+#     #while True:
+#
+#     moves = get_valid_moves(board,player)
+#     #print(moves)
+#     os.system('clear')
+#     print('a b c d e f g h \n')
+#     row = ''
+#     for i in range(len(board)):
+#         for j in range(len(board)):
+#             row += str(board[i][j])
+#             row += ' '
+#
+#         row += ' '
+#         row += str(i+1)
+#         print(row)
+#         row = ''
+#
+#     moves = get_valid_moves(board,player)
+#     #print('\nPlayer ' + str(player) + "'s turn!")
+#     if len(moves) == 0:
+#         #print('No moves available!')
+#         player = get_other_player(player)
+#         #print('\nPlayer ' + str(player) + "'s turn!")
+#         moves = get_valid_moves(board,player)
+#
+#         if len(moves) == 0:
+#             print('No moves available for both players')
+#             print('Game over!')
+#             end_game(board)
+#
+#         else:
+#             print('Player ' + str(get_other_player(player)) + ' has no valid moves')
+#
+#     print('\nPlayer ' + str(player) + "'s turn!")
+#     make_move(board, moves, player)
 
-    moves = get_valid_moves(board,player)
-    #print(moves)
-    os.system('clear')
-    print('a b c d e f g h \n')
-    row = ''
-    for i in range(len(board)):
-        for j in range(len(board)):
-            row += str(board[i][j])
-            row += ' '
-
-        row += ' '
-        row += str(i+1)
-        print(row)
-        row = ''
-
-    moves = get_valid_moves(board,player)
-    #print('\nPlayer ' + str(player) + "'s turn!")
-    if len(moves) == 0:
-        #print('No moves available!')
-        player = get_other_player(player)
-        #print('\nPlayer ' + str(player) + "'s turn!")
-        moves = get_valid_moves(board,player)
-
-        if len(moves) == 0:
-            print('No moves available for both players')
-            print('Game over!')
-            end_game(board)
-
-        else:
-            print('Player ' + str(get_other_player(player)) + ' has no valid moves')
-
-    print('\nPlayer ' + str(player) + "'s turn!")
-    make_move(board, moves, player)
-
-def make_move(board, moves, player):
-    print('Possible moves: ')
-    move_str = ''
-    for move in moves:
-        x = move[0]
-        y = move[1]
-
-        move_str += chr(x+97)
-        move_str += str(y+1) + ' '
-
-    print(move_str)
-
-    next_move = ''
-    while True:
-        next_move = input('Please make move: ')
-        if len(next_move) == 2:
-            break
-        else:
-            print('Move not valid!')
-            print('Possible moves: ')
-            print(move_str)
-
-    while True:
-        x = ord(next_move[0])-97
-        y = int(next_move[1])-1
-
-        if (x,y) in moves:
-            break
-
-        else:
-            print('Move not valid!')
-            print('Possible moves: ')
-            print(move_str)
-
-        next_move = input('Please make move: ')
-
-    board[y][x] = player
-    flip_tiles_on_board(board, player, moves[(x,y)])
-    player = get_other_player(player)
-    draw_board(board,player)
+# def make_move(board, moves, player):
+#     print('Possible moves: ')
+#     move_str = ''
+#     for move in moves:
+#         x = move[0]
+#         y = move[1]
+#
+#         move_str += chr(x+97)
+#         move_str += str(y+1) + ' '
+#
+#     print(move_str)
+#
+#     next_move = ''
+#     while True:
+#         next_move = input('Please make move: ')
+#         if len(next_move) == 2:
+#             break
+#         else:
+#             print('Move not valid!')
+#             print('Possible moves: ')
+#             print(move_str)
+#
+#     while True:
+#         x = ord(next_move[0])-97
+#         y = int(next_move[1])-1
+#
+#         if (x,y) in moves:
+#             break
+#
+#         else:
+#             print('Move not valid!')
+#             print('Possible moves: ')
+#             print(move_str)
+#
+#         next_move = input('Please make move: ')
+#
+#     board[y][x] = player
+#     flip_tiles_on_board(board, player, moves[(x,y)])
+#     player = get_other_player(player)
+#     draw_board(board,player)
 
 def board_full(board):
     cols, rows = get_board_dims(board)
@@ -302,22 +252,12 @@ def board_full(board):
                 return False
     return True
 
-def end_game(board):
-    c1 = 0
-    c2 = 0
-    for x in range(len(board)):
-        for y in range(len(board)):
-            if board[x][y] == 1: c1 += 1
-            elif board[x][y] == 2: c2 += 2
+def get_cartesian_from_standard(standard):
+    return (ord(standard[0]) - 97, int(standard[1]) - 1)
 
-    if c1 > c2:
-        print('Player 1 wins with ' + str(c1) + ' pieces!')
-    elif c2 > c1:
-        print('Player 2 wins with ' + str(c2) + ' pieces!')
-    else:
-        print('Game tied!')
-
-    sys.exit(0)
+def get_standard_from_cartesian(cartesian):
+    x,y = cartesian
+    return str(unichr(x + 97)) + str(y + 1)
 
 class Game:
     def __init__(self):
@@ -334,6 +274,32 @@ class Game:
         self.curr_player = 1
         self.human = None
         self.ai = None
+
+    def end_game(self):
+        c1, c2 = 0, 0
+        cols, rows = get_board_dims(self.board)
+        for x in range(cols):
+            for y in range(rows):
+                if self.board[y][x] == 1:
+                    c1 += 1
+                if self.board[y][x] == 2:
+                    c2 += 2
+        if c1 > c2:
+            print('Player 1 wins with ' + str(c1) + ' pieces!')
+        elif c2 > c1:
+            print('Player 2 wins with ' + str(c2) + ' pieces!')
+        else:
+            print('Game tied!')
+        sys.exit(0)
+
+    def flip_tiles(self, tiles_to_flip):
+        for x,y in tiles_to_flip:
+            self.board[y][x] = self.curr_player
+
+    def make_move(self, move, tiles_to_flip):
+        x,y = move
+        self.board[y][x] = self.curr_player # Place player's tile at x,y
+        self.flip_tiles(tiles_to_flip)
 
     def get_valid_moves(self):
         cols, rows = get_board_dims(self.board)
@@ -356,47 +322,50 @@ class Game:
             line += ' ' + str(y+1)
             print(line)
 
-    def draw_board(self):
-        cols, rows = get_board_dims(self.board)
-        print(' a b c d e f g h \n')
-        line = ''
-        for x in range(cols):
-            for y in range(rows):
-                line += str(self.board[y][x])
-                line += ' '
-            line += ' '
-            line += str(x+1)
-            print(line)
-
     def ai_turn(self):
+        moves_dict = self.get_valid_moves()
         self.print_board()
+
     def human_turn(self):
         self.print_board()
-        moves = get_valid_moves(self.board, self.human)
+        moves_dict = self.get_valid_moves()
+        possible_moves_str = 'Possible moves: '
+        for cart in moves_dict.keys():
+            print(cart)
+            possible_moves_str += get_standard_from_cartesian(cart) + ' '
+        print(possible_moves_str)
 
-def main():
-    game = Game()
-    # print('\nPlayer ' + str(player) + "'s turn!")
+        move_str = ''
+        move = None
+        while True:
+            move_str = raw_input('Please enter move: ')
+            if len(move_str) == 2:
+                move = get_cartesian_from_standard(move_str)
+                if move in moves_dict:
+                    break
+            print('Move not valid!')
+            print(possible_moves_str)
+        self.make_move(move, moves_dict[move])
 
-    print('Welcome to Reversi!')
-    game.human = int(raw_input('Please select player (1/2): '))
-    game.ai = get_other_player(game.human)
-    while not board_full(game.board):
-        if game.curr_player == game.human:
-            game.human_turn()
-        else:
-            game.ai_turn()
-        # moves = draw_board(start_board, player)
 def main():
     try:
-        player = gameHeader()
-        ai = get_other_player(player)
-        moves = draw_board(test_board, player)
+        game = Game()
+
+        print('Welcome to Reversi!')
+        game.human = int(raw_input('Please select player (1/2): '))
+        game.ai = get_other_player(game.human)
+        while not board_full(game.board):
+            os.system('clear')
+            print('Player ' + str(game.curr_player) + "'s turn!")
+            if game.curr_player == game.human:
+                game.human_turn()
+            else:
+                game.human_turn()
+            game.curr_player = get_other_player(game.curr_player)
 
     except KeyboardInterrupt:
         print('\nExiting game...')
-
-    sys.exit(0)
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
