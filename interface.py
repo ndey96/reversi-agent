@@ -58,7 +58,6 @@ def get_valid_moves(board, player):
     return moves_dict
 
 def flip_tiles_on_board(board, player, tiles_to_flip):
-    print(tiles_to_flip)
     for x,y in tiles_to_flip:
         board[y][x] = player
 
@@ -121,14 +120,9 @@ def build_tree(node, board, player, depth_limit=None, curr_player=None):
         curr_player = player
     moves_dict = get_valid_moves(board, curr_player)
     for x,y in moves_dict.keys():
-#         print(x,y,curr_player)
         board_copy = deepcopy(board)
-#         print(1,board_copy)
         board_copy[y][x] = curr_player # Place player's tile at x,y
-#         print(2,board_copy)
-#         print('tiles_to_flip', moves_dict[(x,y)])
         flip_tiles_on_board(board_copy, curr_player, moves_dict[(x,y)])
-#         print(3,board_copy)
 
         new_node = Node()
         new_node.parent = node
@@ -147,68 +141,35 @@ def get_path_from_parent(node):
         curr = curr.parent
     return list(reversed(path_to_parent))
 
-def minimax(node):
-    best_score = -999999
-    best_path = []
-    _minimax(node, best_score, best_path)
-    return best_score, best_path
 
-def _minimax(node, best_score, best_path):
-    if len(node.children) and node.children[0].children == []:
-        local_min = float("inf")
-        min_node = None
-        for child in node.children:
-            if child.eval_val < best_score: # alpha-beta pruning
-                break
-            if child.eval_val < local_min:
-                local_min = child.eval_val
-                min_node = child
-        if local_min > best_score:
-            best_score = local_min
-            best_path = get_path_from_parent(min_node)
-    else:
-        for child in node.children:
-            score, path = _minimax(child, best_score, best_path)
-            if score > best_score:
-                best_score = score
-                best_path = path
-    return best_score, best_path
+class AI:
+    def __init__(self):
+        self.best_score = float("-inf")
+        self.best_path = []
+        self.parent_node
 
-test_board = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,1,2,0,0,0],
-    [0,0,0,2,1,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0]
-]
-
-def gameHeader():
-    print('Welcome to Reversi!')
-    player = int(input('Please select player (1/2): '))
-    print("Starting game...\n")
-
-    return player
+    def minimax(self, node):
+        if len(node.children) and node.children[0].children == []:
+            local_min = float("inf")
+            min_node = None
+            for child in node.children:
+                if child.eval_val < self.best_score: # alpha-beta pruning
+                    break
+                if child.eval_val < local_min:
+                    local_min = child.eval_val
+                    min_node = child
+            if local_min > self.best_score:
+                self.best_score = local_min
+                self.best_path = get_path_from_parent(min_node)
+        else:
+            for child in node.children:
+                self.minimax(child)
 
 def draw_board(board, player):
     #while True:
-    print('a b c d e f g h \n')
-    row = ''
-    for i in range(len(board)):
-        for j in range(len(board)):
-            row += str(board[i][j])
-            row += ' '
-
-        row += ' '
-        row += str(i+1)
-        print(row)
-        row = ''
 
     moves = get_valid_moves(board,player)
     #print(moves)
-    print('\nPlayer ' + str(player) + "'s turn!")
     make_move(board, moves, player)
 
 def make_move(board, moves, player):
@@ -253,13 +214,84 @@ def make_move(board, moves, player):
     player = get_other_player(player)
     draw_board(board,player)
 
+def board_full(board):
+    cols, rows = get_board_dims(board)
+    for x in range(cols):
+        for y in range(rows):
+            if board[y][x] == 0:
+                return False
+    return True
 
 
-def run():
-    player = gameHeader()
-    ai = get_other_player(player)
+class Game:
+    def __init__(self):
+        self.board = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,1,2,0,0,0],
+            [0,0,0,2,1,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+        self.curr_player = 1
+        self.human = None
+        self.ai = None
 
-    moves = draw_board(test_board, player)
+    def get_valid_moves(self):
+        cols, rows = get_board_dims(self.board)
+        moves_dict = {}
+        for x in range(cols):
+            for y in range(rows):
+                if self.board[y][x] == 0:
+                    tiles_to_flip = is_valid_move(self.board, self.curr_player, x, y)
+                    if tiles_to_flip != None:
+                        moves_dict[(x,y)] = tiles_to_flip
+        return moves_dict
+
+    def print_board(self):
+        cols, rows = get_board_dims(self.board)
+        print(' a b c d e f g h')
+        for y in range(rows):
+            line = '|'
+            for x in range(cols):
+                line += str(self.board[y][x]) + '|'
+            line += ' ' + str(y+1)
+            print(line)
+
+    def draw_board(self):
+        cols, rows = get_board_dims(self.board)
+        print(' a b c d e f g h \n')
+        line = ''
+        for x in range(cols):
+            for y in range(rows):
+                line += str(self.board[y][x])
+                line += ' '
+            line += ' '
+            line += str(x+1)
+            print(line)
+
+    def ai_turn(self):
+        self.print_board()
+    def human_turn(self):
+        self.print_board()
+        moves = get_valid_moves(self.board, self.human)
+
+def main():
+    game = Game()
+    # print('\nPlayer ' + str(player) + "'s turn!")
+
+    print('Welcome to Reversi!')
+    game.human = int(raw_input('Please select player (1/2): '))
+    game.ai = get_other_player(game.human)
+    while not board_full(game.board):
+        if game.curr_player == game.human:
+            game.human_turn()
+        else:
+            game.ai_turn()
+        # moves = draw_board(start_board, player)
 
 
-run()
+if __name__ == "__main__":
+    main()
