@@ -12,8 +12,6 @@ BOARD_DIRECTIONS = (
     (1,1),
 )
 
-AVG_TIMES = [2, 8, 250, 3700, 15000, 75000]
-
 def is_in_board(board, x, y):
     board_width, board_height = get_board_dims(board)
     return 0 <= x < board_width and 0 <= y < board_height
@@ -168,7 +166,6 @@ class AI:
             if local_min > self.best_score:
                 self.best_score = local_min
                 self.best_path = get_path_from_parent(min_node)
-                #print('plz',self.best_score,self.best_path)
         else:
             for child in node.children:
                 self._minimax(child)
@@ -180,19 +177,15 @@ def get_standard_from_cartesian(cartesian):
     x,y = cartesian
     return str(unichr(x + 97)) + str(y + 1)
 
+AVG_TIMES = [2, 8, 250, 3700, 15000, 75000] # Milliseconds
 def get_depth_from_time(secs):
     time_limit = secs * 1000
-    depth_limit = 6
-    for i in range(len(AVG_TIMES)-1):
-        if time_limit > AVG_TIMES[i]:
-            continue
-
-        depth_limit = i+1
-
-        break
-    print depth_limit
+    depth_limit = 6 # Default value in case time_limit exceeds all AVG_TIMES
+    for idx, time in enumerate(AVG_TIMES):
+        if time > time_limit:
+            depth_limit = idx
+            break
     return depth_limit
-
 
 class Game:
     def __init__(self):
@@ -237,17 +230,6 @@ class Game:
         self.board[y][x] = self.curr_player # Place player's tile at x,y
         self.flip_tiles(tiles_to_flip)
 
-    # def get_valid_moves(self, player):
-    #     cols, rows = get_board_dims(self.board)
-    #     moves_dict = {}
-    #     for x in range(cols):
-    #         for y in range(rows):
-    #             if self.board[y][x] == 0:
-    #                 tiles_to_flip = is_valid_move(self.board, player, x, y)
-    #                 if tiles_to_flip != None:
-    #                     moves_dict[(x,y)] = tiles_to_flip
-    #     return moves_dict
-
     def print_board(self):
         cols, rows = get_board_dims(self.board)
         print(' a b c d e f g h')
@@ -267,14 +249,8 @@ class Game:
         ai.minimax()
         #time2 = datetime.datetime.now()
         #delta = time2-time1
-        #print int(delta.total_seconds() * 1000)
-        #print('lol',ai.best_path)
-        #print('tree',ai.parent_node.children)
-        for a in ai.parent_node.children:
-            print(a.move)
         x,y,_ = ai.best_path[0]
         best_move = (x,y)
-        #print('nolan', moves_dict)
         self.make_move(best_move, moves_dict[best_move])
 
     def human_turn(self):
@@ -329,7 +305,7 @@ def main():
         game.game_over()
 
     except KeyboardInterrupt:
-        print('\nExiting game...')
+        print('Exiting game...')
         sys.exit(0)
 
 if __name__ == "__main__":
